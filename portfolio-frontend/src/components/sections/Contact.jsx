@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion as Motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 const Contact = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
-
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', company: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState(null)
 
@@ -15,34 +15,35 @@ const Contact = () => {
     setIsSubmitting(true)
     setSubmitStatus(null)
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
-
     try {
-      const response = await fetch(`${apiUrl}/api/contact/submit`, {
+      if (!API_URL) throw new Error('VITE_API_URL is not configured')
+
+      const response = await fetch(`${API_URL}/api/contact/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
-      const data = await response.json()
+      const contentType = response.headers.get('content-type') || ''
+      const data = contentType.includes('application/json') ? await response.json() : {}
 
       if (response.ok) {
         setSubmitStatus({
           success: true,
           message: data.message || "Got it — I'll reply within a day or two."
         })
-        setFormData({ name: '', email: '', message: '' })
+        setFormData({ name: '', email: '', message: '', company: '' })
       } else {
         setSubmitStatus({
           success: false,
-          message: data.message || 'Something went wrong. Try again or email me directly.'
+          message: data.message || 'Something went wrong. Email me directly instead.'
         })
       }
     } catch (error) {
       console.error('Contact form error:', error)
       setSubmitStatus({
         success: false,
-        message: "Couldn't reach the server. Email me at paschalfidel@gmail.com instead."
+        message: "Couldn't reach the server. Email paschalfidel@gmail.com."
       })
     } finally {
       setIsSubmitting(false)
@@ -53,138 +54,134 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  return (
-    <section id="contact" className="py-24 md:py-32 border-t border-[var(--color-border)]">
-      <div className="container mx-auto px-6 max-w-5xl">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
-            <div>
-              <p className="section-label mb-4">Contact</p>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-[var(--color-cream)] mb-4">
-                Say hello
-              </h2>
-              <p className="text-[var(--color-cream-muted)] leading-relaxed mb-8 max-w-md">
-                Hiring for a role, need a contractor, or just want to talk shop?
-                Drop a message — I read everything.
-              </p>
+  const fieldClass =
+    'w-full rounded-md border border-[var(--color-line-strong)] bg-[var(--color-paper)] px-3.5 py-2.5 text-[var(--color-ink)] placeholder:text-[var(--color-dim)] focus:border-[var(--color-ink)] focus:outline-none disabled:opacity-50'
 
-              <div className="space-y-5 text-sm">
-                <div>
-                  <p className="section-label mb-1">Email</p>
-                  <a
-                    href="mailto:paschalfidel@gmail.com"
-                    className="text-[var(--color-cream)] hover:text-[var(--color-accent)] transition-colors"
-                  >
+  return (
+    <section id="contact" aria-labelledby="contact-title" className="scroll-mt-16 border-t border-[var(--color-line)] py-20 md:py-28">
+      <div className="mx-auto max-w-5xl px-6">
+        <Motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="grid gap-14 lg:grid-cols-2"
+        >
+          <div>
+            <p className="eyebrow">Contact</p>
+            <h2 id="contact-title" className="mt-2 font-display text-3xl font-semibold tracking-tight text-[var(--color-ink)] md:text-[2.1rem]">
+              Let’s talk
+            </h2>
+            <p className="mt-4 max-w-md leading-relaxed text-[var(--color-muted)]">
+              If you’re hiring, contracting, or just curious — send a note. I read everything
+              and I reply myself.
+            </p>
+
+            <dl className="mt-10 space-y-5 text-[0.95rem]">
+              <div>
+                <dt className="text-sm text-[var(--color-dim)]">Email</dt>
+                <dd>
+                  <a href="mailto:paschalfidel@gmail.com" className="text-link inline-flex min-h-11 items-center">
                     paschalfidel@gmail.com
                   </a>
-                </div>
-                <div>
-                  <p className="section-label mb-1">Phone</p>
-                  <p className="text-[var(--color-cream-muted)]">+234 803 897 3539</p>
-                </div>
-                <div>
-                  <p className="section-label mb-1">Location</p>
-                  <p className="text-[var(--color-cream-muted)]">Lagos, Nigeria · open to remote</p>
-                </div>
+                </dd>
               </div>
+              <div>
+                <dt className="text-sm text-[var(--color-dim)]">Phone</dt>
+                <dd><a className="text-link inline-flex min-h-11 items-center" href="tel:+2348038973539">+234 803 897 3539</a></dd>
+              </div>
+              <div>
+                <dt className="text-sm text-[var(--color-dim)]">Based in</dt>
+                <dd className="text-[var(--color-ink)]">Lagos · open to remote</dd>
+              </div>
+            </dl>
+          </div>
 
-              <div className="flex flex-wrap gap-4 mt-10 pt-8 border-t border-[var(--color-border)]">
-                <a
-                  href="https://linkedin.com/in/paschalomereife"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-accent)] transition-colors"
-                >
-                  LinkedIn →
-                </a>
-                <a
-                  href="https://github.com/paschalfidel"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--color-cream-dim)] hover:text-[var(--color-accent)] transition-colors"
-                >
-                  GitHub →
-                </a>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4" aria-describedby="form-note" aria-busy={isSubmitting}>
+            <p id="form-note" className="text-sm text-[var(--color-dim)]">Usually replies within two working days.</p>
+            <div className="honeypot" aria-hidden="true">
+              <label htmlFor="company">Company website</label>
+              <input id="company" name="company" type="text" tabIndex="-1" autoComplete="off" value={formData.company} onChange={handleChange} />
+            </div>
+            <div>
+              <label htmlFor="name" className="mb-1.5 block text-sm text-[var(--color-muted)]">
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                autoComplete="name"
+                minLength="2"
+                maxLength="100"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={isSubmitting}
+                className={fieldClass}
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="mb-1.5 block text-sm text-[var(--color-muted)]">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                autoComplete="email"
+                maxLength="254"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isSubmitting}
+                className={fieldClass}
+                placeholder="you@company.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="message" className="mb-1.5 block text-sm text-[var(--color-muted)]">
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                rows="5"
+                minLength="10"
+                maxLength="1000"
+                required
+                disabled={isSubmitting}
+                className={`${fieldClass} resize-none`}
+                placeholder="Role, timeline, anything useful…"
+              />
             </div>
 
-            <motion.form
-              initial={{ opacity: 0, y: 12 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.15, duration: 0.6 }}
-              onSubmit={handleSubmit}
-              className="space-y-4"
-            >
-              <div>
-                <label htmlFor="name" className="section-label block mb-2">Name</label>
-                <input
-                  id="name"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-lg text-[var(--color-cream)] placeholder:text-[var(--color-cream-dim)] focus:border-[var(--color-accent)] focus:outline-none transition-colors disabled:opacity-50"
-                  placeholder="Your name"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="section-label block mb-2">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-lg text-[var(--color-cream)] placeholder:text-[var(--color-cream-dim)] focus:border-[var(--color-accent)] focus:outline-none transition-colors disabled:opacity-50"
-                  placeholder="you@company.com"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="section-label block mb-2">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows="5"
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-3 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-lg text-[var(--color-cream)] placeholder:text-[var(--color-cream-dim)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none disabled:opacity-50"
-                  placeholder="What's on your mind?"
-                />
-              </div>
-
-              {submitStatus && (
-                <div
-                  className={`p-4 rounded-lg text-sm border ${
-                    submitStatus.success
-                      ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)] border-[var(--color-accent)]/30'
-                      : 'bg-red-500/10 text-red-300 border-red-500/20'
-                  }`}
-                >
-                  {submitStatus.message}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            {submitStatus && (
+              <p
+                className={`rounded-md border px-3 py-2.5 text-sm ${
+                  submitStatus.success
+                    ? 'border-[var(--color-success)]/30 bg-green-50 text-[var(--color-success)]'
+                    : 'border-red-200 bg-red-50 text-red-800'
+                }`}
+                role="status"
+                aria-live="polite"
               >
-                {isSubmitting ? 'Sending…' : 'Send message'}
-              </button>
-            </motion.form>
-          </div>
-        </motion.div>
+                {submitStatus.message}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSubmitting ? 'Sending…' : 'Send'}
+            </button>
+          </form>
+        </Motion.div>
       </div>
     </section>
   )

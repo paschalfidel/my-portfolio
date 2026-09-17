@@ -6,11 +6,19 @@ import { sendEmailNotification, sendAutoReply } from '../utils/emailService.js'
 // @access  Public
 export const submitContactForm = async (req, res) => {
   try {
-    const { name, email, message } = req.body
+    const { name, email, message, company } = req.body
+
+    // Honeypot fields catch simple form bots without inconveniencing people.
+    if (company) {
+      return res.status(201).json({
+        success: true,
+        message: 'Message received.'
+      })
+    }
     
     // Get IP and user agent
     const ipAddress = req.ip || req.connection.remoteAddress
-    const userAgent = req.headers['user-agent']
+    const userAgent = req.get('user-agent')?.slice(0, 500) || null
     
     // Check for duplicate submissions (within 5 minutes)
     const recentSubmission = await Contact.findOne({
@@ -36,7 +44,7 @@ export const submitContactForm = async (req, res) => {
     
     await contact.save()
     
-    // Send email notifications (don't await to avoid blocking response)
+    // Persist first; email delivery remains best-effort and does not delay the response.
     Promise.all([
       sendEmailNotification(contact),
       sendAutoReply(contact)
@@ -46,13 +54,7 @@ export const submitContactForm = async (req, res) => {
     
     res.status(201).json({
       success: true,
-      message: 'Message sent successfully! I will get back to you soon.',
-      data: {
-        id: contact._id,
-        name: contact.name,
-        email: contact.email,
-        createdAt: contact.createdAt
-      }
+      message: "Thanks — I received your message and I'll reply within two working days."
     })
     
   } catch (error) {
@@ -60,58 +62,6 @@ export const submitContactForm = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to send message. Please try again later.'
-    })
-  }
-}
-
-// @desc    Get all messages (Admin only - for your learning)
-// @route   GET /api/contact/messages
-// @access  Private (you'll add auth later)
-export const getMessages = async (req, res) => {
-  try {
-    const messages = await Contact.find()
-      .sort({ createdAt: -1 })
-      .limit(100)
-    
-    res.status(200).json({
-      success: true,
-      count: messages.length,
-      data: messages
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch messages'
-    })
-  }
-}
-
-// @desc    Mark message as read
-// @route   PATCH /api/contact/messages/:id/read
-// @access  Private
-export const markAsRead = async (req, res) => {
-  try {
-    const message = await Contact.findByIdAndUpdate(
-      req.params.id,
-      { status: 'read' },
-      { new: true }
-    )
-    
-    if (!message) {
-      return res.status(404).json({
-        success: false,
-        message: 'Message not found'
-      })
-    }
-    
-    res.status(200).json({
-      success: true,
-      data: message
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update message'
     })
   }
 }

@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from 'react'
-// eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
+
+const RESUME_URL = '/Paschal-Omereife-Resume.pdf'
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleScroll = () => setScrolled(window.scrollY > 24)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined
+    const closeOnEscape = event => event.key === 'Escape' && setMobileMenuOpen(false)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => document.removeEventListener('keydown', closeOnEscape)
+  }, [mobileMenuOpen])
 
   const navLinks = [
     { label: 'Work', id: 'work' },
@@ -18,99 +26,80 @@ const Navbar = () => {
     { label: 'Contact', id: 'contact' },
   ]
 
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-      setMobileMenuOpen(false)
-    }
-  }
-
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         scrolled
-          ? 'bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-[var(--color-border)]'
+          ? 'bg-[var(--color-bg)]/92 backdrop-blur-md border-b border-[var(--color-line)]'
           : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-6 max-w-5xl">
-        <div className="flex justify-between items-center h-16 md:h-[4.5rem]">
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="font-display text-lg md:text-xl font-semibold text-[var(--color-cream)] hover:text-[var(--color-accent)] transition-colors"
-          >
-            Paschal<span className="text-[var(--color-accent)]">.</span>
-          </button>
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="flex h-16 items-center justify-between">
+          <a href="#home" className="inline-flex min-h-11 items-center font-display text-[1.05rem] font-semibold tracking-tight text-[var(--color-ink)]">
+            Paschal Omereife
+          </a>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden items-center gap-7 md:flex">
             {navLinks.map((link) => (
-              <button
+              <a
                 key={link.id}
-                type="button"
-                onClick={() => scrollToSection(link.id)}
-                className="text-sm text-[var(--color-cream-muted)] hover:text-[var(--color-cream)] transition-colors"
+                href={`#${link.id}`}
+                className="text-[0.9375rem] text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors"
               >
                 {link.label}
-              </button>
+              </a>
             ))}
-            <a
-              href="https://linkedin.com/in/paschalomereife"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-sm !py-2 !px-4"
-            >
-              Let's talk
+            <a href={RESUME_URL} download="Paschal-Omereife-Resume.pdf" className="btn-primary !py-2 !px-3.5 text-sm">
+              Resume
             </a>
           </nav>
 
           <button
             type="button"
-            className="md:hidden text-[var(--color-cream-muted)] text-xl"
+            className="icon-button mobile-menu-trigger"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
-            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+            <span aria-hidden="true">{mobileMenuOpen ? '×' : '☰'}</span>
           </button>
         </div>
       </div>
 
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-b border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+            id="mobile-navigation"
+            className="border-b border-[var(--color-line)] bg-[var(--color-paper)] md:hidden"
           >
-            <div className="container mx-auto px-6 py-4 flex flex-col gap-1">
+            <div className="mx-auto flex max-w-5xl flex-col px-6 py-3">
               {navLinks.map((link) => (
-                <button
+                <a
                   key={link.id}
-                  type="button"
-                  className="text-left py-3 text-[var(--color-cream-muted)] hover:text-[var(--color-cream)] transition-colors"
-                  onClick={() => scrollToSection(link.id)}
+                  href={`#${link.id}`}
+                  className="py-3 text-left text-[var(--color-muted)]"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}
-                </button>
+                </a>
               ))}
               <a
-                href="https://linkedin.com/in/paschalomereife"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary mt-3 justify-center"
+                href={RESUME_URL}
+                download="Paschal-Omereife-Resume.pdf"
+                className="btn-primary mt-2 mb-3"
               >
-                Let's talk
+                Resume
               </a>
             </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   )
 }
 

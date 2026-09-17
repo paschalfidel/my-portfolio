@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [
     react(),
     tailwindcss(),
@@ -23,8 +23,7 @@ export default defineConfig({
       'react-dom',
       'react-dom/client',
       'framer-motion',
-      'react-intersection-observer',
-      'react-masonry-css'
+      'react-intersection-observer'
     ],
     // Exclude problematic packages
     exclude: []
@@ -33,12 +32,6 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'esbuild',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
     rollupOptions: {
       output: {
         manualChunks(id) {

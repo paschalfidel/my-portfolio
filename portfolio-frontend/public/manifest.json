@@ -4,16 +4,16 @@
   "description": "Full-Stack Software Engineer Portfolio",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#c084fc",
+  "background_color": "#f2eee6",
+  "theme_color": "#f2eee6",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/paschal-omereife-icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

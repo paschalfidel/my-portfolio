@@ -1,5 +1,14 @@
 import nodemailer from 'nodemailer'
 
+export const escapeHtml = (value = '') => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#039;')
+
+export const formatMessage = (value) => escapeHtml(value).replace(/\r?\n/g, '<br>')
+
 // Create transporter based on environment
 const createTransporter = () => {
   // For development/testing with Ethereal (fake email service)
@@ -35,17 +44,17 @@ export const sendEmailNotification = async (contact) => {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #c084fc;">New Portfolio Contact</h2>
-        <p><strong>From:</strong> ${contact.name}</p>
-        <p><strong>Email:</strong> ${contact.email}</p>
+        <p><strong>From:</strong> ${escapeHtml(contact.name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(contact.email)}</p>
         <p><strong>Message:</strong></p>
         <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
-          ${contact.message.replace(/\n/g, '<br>')}
+          ${formatMessage(contact.message)}
         </div>
         <p><strong>Received:</strong> ${new Date(contact.createdAt).toLocaleString()}</p>
         <hr />
         <p style="font-size: 12px; color: #666;">
           Message ID: ${contact._id}<br>
-          IP: ${contact.ipAddress}
+          IP: ${escapeHtml(contact.ipAddress)}
         </p>
       </div>
     `
@@ -67,11 +76,11 @@ export const sendAutoReply = async (contact) => {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #c084fc;">Thank You for Contacting Me! 🙏</h2>
-        <p>Hi ${contact.name},</p>
+        <p>Hi ${escapeHtml(contact.name)},</p>
         <p>Thank you for reaching out to me through my portfolio. I've received your message and will get back to you within 24-48 hours.</p>
         <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <p><strong>Your message:</strong></p>
-          <p>${contact.message.replace(/\n/g, '<br>')}</p>
+          <p>${formatMessage(contact.message)}</p>
         </div>
         <p>In the meantime, feel free to:</p>
         <ul>

@@ -1,6 +1,5 @@
-import React, { Suspense, lazy, useEffect } from 'react'
-// eslint-disable-next-line no-unused-vars
-import { motion, useScroll, useSpring } from 'framer-motion'
+import { Suspense, lazy, useEffect } from 'react'
+import { motion as Motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import LoadingSpinner from './components/ui/LoadingSpinner'
@@ -14,9 +13,10 @@ const Contact = lazy(() => import('./components/sections/Contact'))
 
 function App() {
   const { scrollYProgress } = useScroll()
+  const shouldReduceMotion = useReducedMotion()
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 35,
+    stiffness: 140,
+    damping: 40,
     restDelta: 0.001
   })
 
@@ -31,28 +31,20 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if ('serviceWorker' in navigator && import.meta.env.NODE_ENV === 'production') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(error => {
-          console.error('Service Worker registration failed:', error)
-        })
-      })
-    }
+    if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return undefined
+    const registerServiceWorker = () => navigator.serviceWorker.register('/sw.js').catch(error => console.error('Service Worker registration failed:', error))
+    window.addEventListener('load', registerServiceWorker)
+    return () => window.removeEventListener('load', registerServiceWorker)
   }, [])
 
   return (
     <div className="relative min-h-screen bg-[var(--color-bg)]">
-      <div className="page-grain" aria-hidden="true" />
-
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] bg-[var(--color-accent)] origin-left z-50"
-        style={{ scaleX }}
-        aria-hidden="true"
-      />
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      {!shouldReduceMotion && <Motion.div className="fixed left-0 right-0 top-0 z-50 h-[2px] origin-left bg-[var(--color-accent)]" style={{ scaleX }} aria-hidden="true" />}
 
       <Navbar />
 
-      <main className="relative z-10">
+      <main id="main-content">
         <Suspense fallback={<LoadingSpinner />}>
           <Hero />
           <Work />

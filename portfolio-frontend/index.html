@@ -9,6 +9,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/paschal-omereife-favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/paschal-omereife-favicon-48.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#f2eee6" />
 
     <meta
       name="viewport"
@@ -18,7 +20,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
+      content="default"
     />
     <meta name="format-detection" content="telephone=no" />
 
@@ -57,7 +59,10 @@
       property="og:description"
       content="Full-stack engineer in Lagos building products with React and Node."
     />
-    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image" content="https://paschalomereife.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Paschal Omereife — full-stack engineer building useful web products" />
     <meta property="og:site_name" content="Paschal Omereife" />
 
     <!-- Twitter / X -->
@@ -74,7 +79,8 @@
       property="twitter:description"
       content="Full-stack engineer in Lagos building products with React and Node."
     />
-    <meta property="twitter:image" content="/og-image.jpg" />
+    <meta property="twitter:image" content="https://paschalomereife.vercel.app/og-image.png" />
+    <meta property="twitter:image:alt" content="Paschal Omereife — full-stack engineer building useful web products" />
 
     <!-- Canonical URL -->
     <link
@@ -85,18 +91,28 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Paschal Chidebe Omereife",
+        "url": "https://paschalomereife.vercel.app/",
+        "image": "https://paschalomereife.vercel.app/headshot.webp",
+        "jobTitle": "Full-Stack Software Engineer",
+        "address": { "@type": "PostalAddress", "addressLocality": "Lagos", "addressCountry": "NG" },
+        "sameAs": [
+          "https://github.com/paschalfidel",
+          "https://linkedin.com/in/paschalomereife"
+        ],
+        "knowsAbout": ["React", "Node.js", "Express", "MongoDB", "PostgreSQL", "REST APIs"]
+      }
+    </script>
   </head>
 
   <body>
@@ -104,21 +120,5 @@
 
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-DCQPHDP27Q"
-    ></script>
-
-    <script>
-      window.dataLayer = window.dataLayer || [];
-
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-
-      gtag("js", new Date());
-      gtag("config", "G-DCQPHDP27Q");
-    </script>
   </body>
 </html>

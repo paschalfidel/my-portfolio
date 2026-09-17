@@ -6,7 +6,7 @@ export const reportPerformance = () => {
       if ('performance' in window) {
         // Get paint metrics safely
         const paintMetrics = performance.getEntriesByType('paint')
-        if (paintMetrics.length > 0 && import.meta.env.NODE_ENV === 'development') {
+        if (paintMetrics.length > 0 && import.meta.env.DEV) {
           paintMetrics.forEach(metric => {
             console.log(`${metric.name}: ${metric.startTime.toFixed(2)}ms`)
           })
@@ -14,7 +14,7 @@ export const reportPerformance = () => {
         
         // Get navigation timing safely
         const navigationTiming = performance.getEntriesByType('navigation')[0]
-        if (navigationTiming && import.meta.env.NODE_ENV === 'development') {
+        if (navigationTiming && import.meta.env.DEV) {
           const loadTime = navigationTiming.loadEventEnd - navigationTiming.fetchStart
           const domInteractive = navigationTiming.domInteractive - navigationTiming.fetchStart
           console.log('Page Load Time:', loadTime.toFixed(2), 'ms')
@@ -27,7 +27,7 @@ export const reportPerformance = () => {
 
 // Safe interaction tracking
 export const trackInteraction = (elementName, action) => {
-  if (import.meta.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(`Interaction tracked: ${elementName} - ${action}`)
   }
 }

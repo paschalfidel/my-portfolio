@@ -1,9 +1,13 @@
-const CACHE_NAME = 'portfolio-v1'
+const CACHE_NAME = 'portfolio-v3'
 const urlsToCache = [
   '/',
   '/index.html',
-  '/src/main.jsx',
-  '/src/index.css'
+  '/manifest.json',
+  '/headshot.webp',
+  '/projects/handigo.webp',
+  '/projects/specreel.svg',
+  '/projects/recommender.webp',
+  '/projects/spec360.webp'
 ]
 
 self.addEventListener('install', (event) => {
@@ -14,9 +18,18 @@ self.addEventListener('install', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => response || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok) {
+          const copy = response.clone()
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy))
+        }
+        return response
+      })
+      .catch(() => caches.match(event.request))
   )
 })
 
@@ -32,4 +45,5 @@ self.addEventListener('activate', (event) => {
       )
     })
   )
+  self.clients.claim()
 })

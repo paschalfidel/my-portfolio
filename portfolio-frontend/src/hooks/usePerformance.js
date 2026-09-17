@@ -11,7 +11,7 @@ export const usePerformance = (componentName) => {
     
     return () => {
       // Log unmount time when component unmounts
-      if (startTime.current && import.meta.env.NODE_ENV === 'development') {
+      if (startTime.current && import.meta.env.DEV) {
         const unmountTime = performance.now() - startTime.current
         console.log(`${componentName} was mounted for ${unmountTime.toFixed(2)}ms`)
       }
@@ -20,7 +20,7 @@ export const usePerformance = (componentName) => {
   
   // Optional: log mount time in separate effect
   useEffect(() => {
-    if (startTime.current && import.meta.env.NODE_ENV === 'development') {
+    if (startTime.current && import.meta.env.DEV) {
       const mountTime = performance.now() - startTime.current
       console.log(`${componentName} mounted in ${mountTime.toFixed(2)}ms`)
     }

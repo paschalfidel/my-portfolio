@@ -13,7 +13,7 @@ import mongoose from 'mongoose';
         required: [true, 'Email is required'],
         trim: true,
         lowercase: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email address']
+        maxlength: [254, 'Email cannot exceed 254 characters']
     },
     message: {
         type: String,

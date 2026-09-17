@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import mongoose from 'mongoose';
 import connectDB from './config/database.js';
 import contactRoutes from './routes/contactRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -10,35 +11,50 @@ import { errorHandler } from './middleware/errorHandler.js';
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Define allowed origins
-const allowedOrigins =[
-    'https://paschalomereife.vercel.app',
-    'https://portfolio-frontend.vercel.app', // Alternative URL
-    'http://localhost:5173',  // Local development
-    'http://localhost:3000',   // Alternative local port
-]
+const validateRuntimeConfig = () => {
+  const required = ['MONGODB_URI']
+  if (process.env.NODE_ENV === 'production') required.push('EMAIL_USER', 'EMAIL_PASS')
+
+  const missing = required.filter(name => !process.env[name])
+  if (missing.length) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`)
+  }
+}
+
+// Render terminates TLS before forwarding requests, so Express must trust one proxy
+// hop for req.ip and express-rate-limit to identify visitors correctly.
+app.set('trust proxy', 1)
+app.disable('x-powered-by')
+
+const productionOrigins = (process.env.ALLOWED_ORIGINS || 'https://paschalomereife.vercel.app')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean)
+
+const developmentOrigins = ['http://localhost:5173', 'http://localhost:3000']
+const allowedOrigins = new Set([
+  ...productionOrigins,
+  ...(process.env.NODE_ENV === 'production' ? [] : developmentOrigins)
+])
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true)
     
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.has(origin)) {
       callback(null, true)
     } else {
-      console.log('Blocked origin:', origin)
-      callback(new Error('Not allowed by CORS'))
+      const error = new Error('Origin is not allowed')
+      error.status = 403
+      callback(error)
     }
   },
-  credentials: true,  // Important for cookies/auth
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
 }
 
 // Convert environment variables to numbers
@@ -60,8 +76,8 @@ app.use(cors(corsOptions));
 
 // Rest of middleware
 app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: false, limit: '16kb' }))
 
 // Apply rate limiting to contact routes
 app.use('/api/contact', limiter);
@@ -77,9 +93,35 @@ app.get('/api/health', (req, res) => {
 // Error handling middleware 
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV}`)
-    console.log(`Rate limiting: ${rateLimitWindowMs / 1000 / 60} minutes, ${rateLimitMax} requests max`)
-})
+const startServer = async () => {
+  try {
+    validateRuntimeConfig()
+    await connectDB()
+    const server = app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
+    })
+
+    let isShuttingDown = false
+    const shutdown = async signal => {
+      if (isShuttingDown) return
+      isShuttingDown = true
+      console.log(`${signal} received. Closing server.`)
+      server.close(async () => {
+        await mongoose.disconnect()
+        process.exit(0)
+      })
+
+      // Do not leave a deployment hanging indefinitely on open sockets.
+      setTimeout(() => process.exit(1), 10000).unref()
+    }
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'))
+    process.on('SIGINT', () => shutdown('SIGINT'))
+  } catch (error) {
+    console.error(`Server startup failed: ${error.message}`)
+    process.exit(1)
+  }
+}
+
+startServer()

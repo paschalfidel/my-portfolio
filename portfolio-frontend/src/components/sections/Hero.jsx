@@ -1,136 +1,62 @@
-import React from 'react'
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
+import { motion as Motion, useReducedMotion } from 'framer-motion'
 
 const RESUME_URL = '/Paschal-Omereife-Resume.pdf'
 
 const Hero = () => {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
-
-  const scrollToWork = () => {
-    document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const skills = ['React', 'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'REST APIs']
+  const shouldReduceMotion = useReducedMotion()
+  const reveal = shouldReduceMotion ? {} : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 } }
 
   return (
-    <section id="home" className="relative min-h-[92vh] flex items-center pt-28 pb-16 overflow-hidden">
-      <div className="hero-glow" aria-hidden="true" />
+    <section id="home" aria-labelledby="hero-title" className="pb-20 pt-28 md:pb-28 md:pt-36">
+      <div className="mx-auto grid max-w-5xl items-start gap-12 px-6 lg:grid-cols-[1fr_220px]">
+        <Motion.div {...reveal} transition={{ duration: 0.55, ease: 'easeOut' }}>
+          <p className="mb-5 flex flex-wrap items-center gap-2 text-[0.95rem] text-[var(--color-muted)]"><span className="status-dot" aria-hidden="true" /> Available for full-time and contract roles <span aria-hidden="true">·</span> Lagos / remote</p>
 
-      <div className="container mx-auto px-6 max-w-5xl relative">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-16 items-start"
-        >
-          <div>
-            <div className="flex flex-wrap items-center gap-3 mb-8">
-              <span className="inline-flex items-center gap-2 text-sm text-[var(--color-cream-muted)]">
-                <span className="w-2 h-2 rounded-full bg-[var(--color-success)] animate-pulse" />
-                Open to full-time &amp; contract roles
-              </span>
-              <span className="hidden sm:inline text-[var(--color-cream-dim)]">·</span>
-              <span className="text-sm text-[var(--color-cream-dim)]">Lagos, Nigeria</span>
-            </div>
+          <h1 id="hero-title" className="font-display text-[clamp(2.6rem,6vw,4.35rem)] font-semibold leading-[1.04] tracking-tight text-[var(--color-ink)]">
+            I build useful web products, end to end.
+          </h1>
 
-            <h1 className="font-display text-[clamp(2.75rem,8vw,4.75rem)] leading-[1.05] font-semibold text-[var(--color-cream)] mb-6 max-w-3xl">
-              I build web products that solve{' '}
-              <em className="not-italic text-[var(--color-accent)]">real</em> problems.
-            </h1>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--color-muted)] md:text-[1.2rem]">
+            I’m Paschal, a full-stack engineer who turns real customer problems into reliable React and Node.js products.
+          </p>
 
-            <p className="text-lg md:text-xl text-[var(--color-cream-muted)] leading-relaxed max-w-2xl mb-4">
-              Hi — I'm Paschal. Full-stack engineer with seven years of customer-facing and IT
-              support experience. I ship React frontends, Node backends, and the glue in between.
-            </p>
+          <p className="mt-4 max-w-xl leading-relaxed text-[var(--color-dim)]">
+            Six years solving telecom issues taught me how to listen, debug under pressure, and explain the difficult parts clearly. Now I bring that discipline to product engineering.
+          </p>
 
-            <p className="text-base text-[var(--color-cream-dim)] leading-relaxed max-w-xl mb-10">
-              Previously resolving telecom issues at scale. Now building platforms like movie
-              recommendations and local service marketplaces.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mb-16">
-              <button type="button" onClick={scrollToWork} className="btn-primary">
-                View selected work
-                <i className="fas fa-arrow-right text-sm"></i>
-              </button>
-              <a
-                href={RESUME_URL}
-                download="Paschal-Omereife-Resume.pdf"
-                className="btn-secondary"
-              >
-                <i className="fas fa-file-pdf text-sm"></i>
-                Download résumé
-              </a>
-            </div>
-
-            <div className="pt-8 border-t border-[var(--color-border)]">
-              <p className="section-label mb-4">Stack I work with</p>
-              <ul className="flex flex-wrap gap-x-6 gap-y-2">
-                {skills.map((skill) => (
-                  <li
-                    key={skill}
-                    className="font-mono text-sm text-[var(--color-cream-dim)]"
-                  >
-                    {skill}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <a href="#work" className="btn-primary">See selected work</a>
+            <a href={RESUME_URL} download="Paschal-Omereife-Resume.pdf" className="btn-secondary">
+              Download resume
+            </a>
+            <a href="mailto:paschalfidel@gmail.com" className="btn-secondary">
+              Email me
+            </a>
           </div>
+        </Motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={inView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
-            className="hidden lg:block shrink-0"
-          >
-            <div className="relative">
-              <div
-                className="absolute -inset-3 rounded-2xl border border-[var(--color-border)] rotate-2"
-                aria-hidden="true"
-              />
-              <div className="relative w-64 xl:w-72 aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--color-border-strong)] bg-[var(--color-bg-muted)]">
-                <img
-                  src="/headshot.PNG"
-                  alt="Paschal Omereife — Full-stack software engineer"
-                  className="w-full h-full object-cover object-top"
-                  width={288}
-                  height={360}
-                  loading="eager"
-                  fetchPriority="high"
-                />
-              </div>
-              <p className="mt-4 text-center font-mono text-xs text-[var(--color-cream-dim)]">
-                Paschal Omereife
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Mobile headshot */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:hidden flex items-center gap-5 mb-2 -mt-4"
-          >
-            <div className="w-20 h-20 rounded-xl overflow-hidden border border-[var(--color-border-strong)] shrink-0">
-              <img
-                src="/headshot.PNG"
-                alt="Paschal Omereife"
-                className="w-full h-full object-cover object-top"
-                width={80}
-                height={80}
-              />
-            </div>
-            <div>
-              <p className="font-display text-lg text-[var(--color-cream)]">Paschal Omereife</p>
-              <p className="text-sm text-[var(--color-cream-dim)]">Full-stack engineer</p>
-            </div>
-          </motion.div>
-        </motion.div>
+        <Motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: shouldReduceMotion ? 0 : 0.12, ease: 'easeOut' }}
+          className="flex items-center gap-4 lg:block"
+        >
+          <img
+            src="/headshot.webp"
+            alt="Paschal Omereife, full-stack software engineer"
+            width={220}
+            height={275}
+            className="h-20 w-20 rounded-lg object-cover object-top ring-1 ring-[var(--color-line-strong)] lg:h-auto lg:w-full lg:aspect-[4/5]"
+            loading="eager"
+            fetchPriority="high"
+          />
+          <div className="lg:mt-3 lg:text-center">
+            <p className="font-display text-base font-semibold text-[var(--color-ink)]">
+              Paschal Omereife
+            </p>
+            <p className="text-sm text-[var(--color-dim)]">Lagos, Nigeria</p>
+          </div>
+        </Motion.div>
       </div>
     </section>
   )

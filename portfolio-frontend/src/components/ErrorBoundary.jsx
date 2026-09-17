@@ -1,6 +1,4 @@
 import React from 'react'
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -9,8 +7,7 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true },
-    console.log(error)
+    return { hasError: true, error }
   }
 
   componentDidCatch(error, errorInfo) {
@@ -27,23 +24,18 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass-effect rounded-2xl p-8 max-w-md text-center"
-          >
-            <i className="fas fa-exclamation-triangle text-5xl text-yellow-500 mb-4"></i>
-            <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
-            <p className="text-gray-300 mb-4">
-              We apologize for the inconvenience. Please try refreshing the page.
+          <div role="alert" className="max-w-md rounded-xl border border-[var(--color-line)] bg-[var(--color-paper)] p-8 text-center">
+            <h2 className="font-display text-2xl font-semibold mb-2">Something broke</h2>
+            <p className="text-[var(--color-muted)] mb-4">
+              Refresh the page and it should come back.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="bg-purple-500 hover:bg-purple-600 px-6 py-2 rounded-full transition-colors"
+              className="btn-primary"
             >
-              Refresh Page
+              Refresh page
             </button>
-          </motion.div>
+          </div>
         </div>
       )
     }

@@ -2,8 +2,8 @@ import React from 'react'
 
 const LoadingSpinner = () => {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[var(--color-border-strong)] border-t-[var(--color-accent)] rounded-full animate-spin" />
+    <div className="flex min-h-[50vh] items-center justify-center" role="status" aria-label="Loading page content">
+      <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--color-line-strong)] border-t-[var(--color-accent)] motion-reduce:animate-none" aria-hidden="true" />
     </div>
   )
 }

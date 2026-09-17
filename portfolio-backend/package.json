@@ -2,13 +2,17 @@
   "name": "portfolio-backend",
   "version": "1.0.0",
   "description": "My portfolio backend API",
-  "license": "ISC",
+  "license": "MIT",
   "author": "Paschal Omereife",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.6",

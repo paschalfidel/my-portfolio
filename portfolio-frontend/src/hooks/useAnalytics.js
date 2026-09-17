@@ -4,7 +4,7 @@ export const useAnalytics = () => {
   useEffect(() => {
     // Track page view after mount
     const trackPageView = () => {
-      if (import.meta.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log('Page view tracked:', window.location.pathname)
       }
       // Send to analytics service here
@@ -14,7 +14,7 @@ export const useAnalytics = () => {
     const handleOutboundLink = (e) => {
       const target = e.target.closest('a')
       if (target && target.href && !target.href.includes(window.location.origin)) {
-        if (import.meta.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.log('Outbound click:', {
             url: target.href,
             text: target.innerText || target.textContent
