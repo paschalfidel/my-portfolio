@@ -29,7 +29,7 @@ const Hero = () => {
             <a href={RESUME_URL} download="Paschal-Omereife-Resume.pdf" className="btn-secondary">
               Download resume
             </a>
-            <a href="mailto:paschalfidel@gmail.com" className="btn-secondary">
+            <a href="#contact" className="btn-secondary">
               Email me
             </a>
           </div>
